@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://jobs:jobs@localhost:5432/jobs"
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  type        String
+  payload     Json
+  status      String
+  priority    Int      @default(0)
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3)
+  error       String?
+  result      Json?
+  progress    Int      @default(0)
+  scheduledAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
