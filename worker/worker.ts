@@ -2,6 +2,8 @@ import { Worker } from "bullmq";
 import IORedis from "ioredis";
 import { prisma } from "../api/db";
 import nodemailer from "nodemailer";
+import "dotenv/config";
+
 
 const connection = new IORedis({
   maxRetriesPerRequest: null,
@@ -13,8 +15,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "hai1361988@gmail.com",
-    pass: "cttx gtic ruho qnqz",
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
   },
 });
 
