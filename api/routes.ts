@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { prisma } from "./db";
-import { jobQueue } from "./queue";
+import { prisma } from "./db"; 
+import { jobQueue } from "./queue"; 
 
 const router = Router();
 
@@ -13,25 +13,31 @@ router.post("/", async (req, res) => {
       payload,
       status: "pending",
       priority: priority || 0,
-      scheduledAt
-    }
+      scheduledAt,
+    },
   });
 
-  await jobQueue.add(type, { jobId: job.id }, {
-    priority,
-    delay: scheduledAt
-      ? new Date(scheduledAt).getTime() - Date.now()
-      : 0,
-    attempts: 3
-  });
+  await jobQueue.add(
+    type,
+    { jobId: job.id },
+    {
+      priority,
+      delay: scheduledAt
+        ? Math.max(new Date(scheduledAt).getTime() - Date.now(), 0)
+        : 0,
+      attempts: 3,
+    }
+  );
 
   res.send(job);
 });
 
 router.get("/:id", async (req, res) => {
-  res.send(await prisma.job.findUnique({
-    where: { id: req.params.id }
-  }));
+  const job = await prisma.job.findUnique({
+    where: { id: req.params.id },
+  });
+
+  res.send(job);
 });
 
 router.get("/", async (_, res) => {
@@ -41,7 +47,7 @@ router.get("/", async (_, res) => {
 router.post("/:id/cancel", async (req, res) => {
   await prisma.job.update({
     where: { id: req.params.id },
-    data: { status: "cancelled" }
+    data: { status: "cancelled" },
   });
 
   res.send({ cancelled: true });
@@ -49,8 +55,12 @@ router.post("/:id/cancel", async (req, res) => {
 
 router.post("/:id/retry", async (req, res) => {
   const job = await prisma.job.findUnique({
-    where: { id: req.params.id }
+    where: { id: req.params.id },
   });
+
+  if (!job) {
+    return res.status(404).send({ error: "Job not found" });
+  }
 
   await jobQueue.add(job.type, { jobId: job.id });
 

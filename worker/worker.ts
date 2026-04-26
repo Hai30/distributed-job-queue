@@ -3,7 +3,9 @@ import IORedis from "ioredis";
 import { prisma } from "../api/db";
 import nodemailer from "nodemailer";
 
-const connection = new IORedis();
+const connection = new IORedis({
+  maxRetriesPerRequest: null,
+});
 
 // -------------------- Email Transport --------------------
 const transporter = nodemailer.createTransport({
@@ -11,8 +13,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "your@email.com",
-    pass: "app-password",
+    user: "hai1361988@gmail.com",
+    pass: "cttx gtic ruho qnqz",
   },
 });
 
